@@ -18,11 +18,17 @@ import time
 nGenerations = 100   
 nLineages = 10
 noiseLess = False
+shuffle = True
 
 if noiseLess:
     noiseStr = '_noiseless_'
 else:
     noiseStr = ''
+    
+if shuffle:
+    shuffleStr = '_shuffle_'
+else:
+    shuffleStr = ''
 
 
 
@@ -71,11 +77,14 @@ for lineageIdx in range(nLineages):
             observations, u, ts = lineageDict['observations'][:,:nGenerations], lineageDict['u'], lineageDict['ts']
             # observations: [f, xb, xd, T])
         
+            if shuffle:
+                observations = observations[:,np.random.permutation(np.arange(nGenerations))]
+        
             nlogLikelihood_gt = calc_logLikelihood(np.array([mu_u_gt, sigma_u_gt, tau_u]), observations[lineageIdx], mechanismType)
             
             gtDict = {'mechanismType': mechanismType, 'lineageIdx': lineageIdx, 'mu_u_gt': mu_u_gt, 'sigma_u_gt': sigma_u_gt, 'tau_u': tau_u, 'nll': nlogLikelihood_gt}
             print('')
-            print('gt:' + mechanismType + noiseStr + f' lineage {lineageIdx} out of {nLineages} nGens={nGenerations}: mu_u_gt = {str(round(mu_u_gt, 4))}, sigma_u_gt = {str(round(sigma_u_gt, 4))}, tau_u_gt = {str(round(tau_u, 4))}. nll_gt = {str(round(nlogLikelihood_gt, 4))}')
+            print('gt:' + mechanismType + noiseStr + shuffleStr + f' lineage {lineageIdx} out of {nLineages} nGens={nGenerations}: mu_u_gt = {str(round(mu_u_gt, 4))}, sigma_u_gt = {str(round(sigma_u_gt, 4))}, tau_u_gt = {str(round(tau_u, 4))}. nll_gt = {str(round(nlogLikelihood_gt, 4))}')
             
             mu_u_est, sigma_u_est, tau_u_est, nloglikelihood_est = ml_optimization(observations[lineageIdx], 'sizer', bounds)
             sizer_est_dict = {'mu_u_est': mu_u_est, 'sigma_u_est': sigma_u_est, 'tau_u_est': tau_u_est, 'nll': nloglikelihood_est}
@@ -89,6 +98,6 @@ for lineageIdx in range(nLineages):
             
             resultsDict = {'gtDict': gtDict, 'sizer_est_dict': sizer_est_dict, 'adder_est_dict': adder_est_dict}
             resultsList.append(resultsDict)
-            pickle.dump(resultsList, open('new_results_nGnes_' + noiseStr + str(nGenerations) + '_.pt', 'wb'))
+            pickle.dump(resultsList, open('new_results_nGnes_' + noiseStr + shuffleStr + str(nGenerations) + '_.pt', 'wb'))
             stoptime = time.time()
             print(f'lineage processing time is {str(round(stoptime-starttime))} sec')

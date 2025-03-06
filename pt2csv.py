@@ -12,15 +12,15 @@ import numpy as np
 from matplotlib import pyplot as plt
 from main_func import calc_logLikelihood, plot_cs_and_lineage
 
-newResults = False
+newResults = True
 
 if newResults:
-    results_nGnes_100_ = pickle.load(open('./new_results_nGnes_100_.pt', 'rb'))
-    resultsList = [results_nGnes_100_]
+    new_results_nGnes_100_ = pickle.load(open('./new_results_nGnes_100_.pt', 'rb'))
+    resultsList = [new_results_nGnes_100_]
     nGensList = [100]
     noiseless = [0]
 else:
-
+    new_results_nGnes_100_ = pickle.load(open('./new_results_nGnes_100_.pt', 'rb'))
     results_nGnes__noiseless_2_ = pickle.load(open('./results_nGnes__noiseless_2_.pt', 'rb'))
     results_nGnes__noiseless_100_ = pickle.load(open('./results_nGnes__noiseless_100_.pt', 'rb'))
     results_nGnes_1_ = pickle.load(open('./results_nGnes_1_.pt', 'rb'))
@@ -30,9 +30,9 @@ else:
     
     
     
-    resultsList = [results_nGnes__noiseless_2_, results_nGnes__noiseless_100_, results_nGnes_1_, results_nGnes_2_, results_nGnes_20_, results_nGnes_100_]
-    nGensList = [2, 100, 1, 2, 20, 100]
-    noiseless = [1, 1, 0, 0, 0, 0]
+    resultsList = [new_results_nGnes_100_, results_nGnes__noiseless_2_, results_nGnes__noiseless_100_, results_nGnes_1_, results_nGnes_2_, results_nGnes_20_, results_nGnes_100_]
+    nGensList = [100, 2, 100, 1, 2, 20, 100]
+    noiseless = [0, 1, 1, 0, 0, 0, 0]
 
 features = ['sizer_gt', 'noiseless', 'nGens', 'lineage', 
                       'mu_u_gt', 'sigma_u_gt', 'tau_u_gt', 'nll_gt',
