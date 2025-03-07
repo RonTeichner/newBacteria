@@ -26,7 +26,7 @@ gamma_shape, gamma_scale = 25, 9.4e-4
 
 
 nGenerations = 100
-batch_size = 10
+batch_size = 100
 
 
 for mechanismType in ['sizer', 'adder']:
@@ -37,7 +37,7 @@ for mechanismType in ['sizer', 'adder']:
         
     for tau_u in [2,40,200]:
 
-        filename = mechanismType + noiseStr + '_tau_' + str(tau_u) + '_lineages.pt'
+        filename = 'largeDB_' + mechanismType + noiseStr + '_tau_' + str(tau_u) + '_lineages.pt'
         print('starting ' + filename)
         sleep(1)
         if not(os.path.isfile(filename)):
