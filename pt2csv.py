@@ -12,7 +12,7 @@ import numpy as np
 from matplotlib import pyplot as plt
 from main_func import calc_logLikelihood, plot_cs_and_lineage
 
-newResults = True
+newResults = False
 
 if newResults:
     new_results_nGnes_100_ = pickle.load(open('./new_results_nGnes_100_.pt', 'rb'))
@@ -62,29 +62,41 @@ else:
 ###############
 plt.figure()
 filteredDf = df[(df['sizer_gt'] == 1) & (df['noiseless'] == 0) & (df['nGens'] == 100) & (df['tau_u_gt'] == 2)]
-r = -(filteredDf['nll_sizer'] - filteredDf['nll_adder'])
-plt.plot(r, 1*np.ones(filteredDf.shape[0]), 'b.', label=r'sizer, nGens=100, $\tau_u=2$')
+rs = -(filteredDf['nll_sizer'] - filteredDf['nll_adder'])
+nCorrect_sizer = (rs>0).sum()
+nTotal_sizer = filteredDf.shape[0]
+plt.plot(rs, 1*np.ones(filteredDf.shape[0]), 'b.', label=r'sizer, nGens=100, $\tau_u=2$')
 
 filteredDf = df[(df['sizer_gt'] == 0) & (df['noiseless'] == 0) & (df['nGens'] == 100) & (df['tau_u_gt'] == 2)]
-r = -(filteredDf['nll_sizer'] - filteredDf['nll_adder'])
-plt.plot(r, 2*np.ones(filteredDf.shape[0]), 'b+',  label=r'adder, nGens=100, $\tau_u=2$')
+ra = -(filteredDf['nll_sizer'] - filteredDf['nll_adder'])
+nCorrect_adder = (ra<0).sum()
+nTotal_adder = filteredDf.shape[0]
+plt.plot(ra, 2*np.ones(filteredDf.shape[0]), 'b+',  label=r'adder, nGens=100, $\tau_u=2$; ' + f'#lineages={nTotal_sizer+nTotal_adder}, %correct={str(round(100*(nCorrect_sizer+nCorrect_adder)/(nTotal_sizer+nTotal_adder)))}, performance={str(round(np.concatenate((-ra,rs)).mean()))}')
 ###########
 filteredDf = df[(df['sizer_gt'] == 1) & (df['noiseless'] == 0) & (df['nGens'] == 100) & (df['tau_u_gt'] == 40)]
-r = -(filteredDf['nll_sizer'] - filteredDf['nll_adder'])
-plt.plot(r, 3*np.ones(filteredDf.shape[0]), 'g.', label=r'sizer, nGens=100, $\tau_u=40$')
+rs = -(filteredDf['nll_sizer'] - filteredDf['nll_adder'])
+nCorrect_sizer = (rs>0).sum()
+nTotal_sizer = filteredDf.shape[0]
+plt.plot(rs, 3*np.ones(filteredDf.shape[0]), 'g.', label=r'sizer, nGens=100, $\tau_u=40$')
 
 filteredDf = df[(df['sizer_gt'] == 0) & (df['noiseless'] == 0) & (df['nGens'] == 100) & (df['tau_u_gt'] == 40)]
-r = -(filteredDf['nll_sizer'] - filteredDf['nll_adder'])
-plt.plot(r, 4*np.ones(filteredDf.shape[0]), 'g+',  label=r'adder, nGens=100, $\tau_u=40$')
+ra = -(filteredDf['nll_sizer'] - filteredDf['nll_adder'])
+nCorrect_adder = (ra<0).sum()
+nTotal_adder = filteredDf.shape[0]
+plt.plot(ra, 4*np.ones(filteredDf.shape[0]), 'g+',  label=r'adder, nGens=100, $\tau_u=40$; ' + f'#lineages={nTotal_sizer+nTotal_adder}, %correct={str(round(100*(nCorrect_sizer+nCorrect_adder)/(nTotal_sizer+nTotal_adder)))}, performance={str(round(np.concatenate((-ra,rs)).mean()))}')
 
 ###########
 filteredDf = df[(df['sizer_gt'] == 1) & (df['noiseless'] == 0) & (df['nGens'] == 100) & (df['tau_u_gt'] == 200)]
-r = -(filteredDf['nll_sizer'] - filteredDf['nll_adder'])
-plt.plot(r, 5*np.ones(filteredDf.shape[0]), 'r.', label=r'sizer, nGens=100, $\tau_u=200$')
+rs = -(filteredDf['nll_sizer'] - filteredDf['nll_adder'])
+nCorrect_sizer = (rs>0).sum()
+nTotal_sizer = filteredDf.shape[0]
+plt.plot(rs, 5*np.ones(filteredDf.shape[0]), 'r.', label=r'sizer, nGens=100, $\tau_u=200$')
 
 filteredDf = df[(df['sizer_gt'] == 0) & (df['noiseless'] == 0) & (df['nGens'] == 100) & (df['tau_u_gt'] == 200)]
-r = -(filteredDf['nll_sizer'] - filteredDf['nll_adder'])
-plt.plot(r, 6*np.ones(filteredDf.shape[0]), 'r+',  label=r'adder, nGens=100, $\tau_u=200$')
+ra = -(filteredDf['nll_sizer'] - filteredDf['nll_adder'])
+nCorrect_adder = (ra<0).sum()
+nTotal_adder = filteredDf.shape[0]
+plt.plot(ra, 6*np.ones(filteredDf.shape[0]), 'r+',  label=r'adder, nGens=100, $\tau_u=200$; ' + f'#lineages={nTotal_sizer+nTotal_adder}, %correct={str(round(100*(nCorrect_sizer+nCorrect_adder)/(nTotal_sizer+nTotal_adder)))}, performance={str(round(np.concatenate((-ra,rs)).mean()))}')
 
 
 plt.grid()
@@ -94,33 +106,46 @@ plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
 plt.show()
 
 if not newResults:
-    #################
+    ###############
     plt.figure()
     filteredDf = df[(df['sizer_gt'] == 1) & (df['noiseless'] == 0) & (df['nGens'] == 20) & (df['tau_u_gt'] == 2)]
-    r = -(filteredDf['nll_sizer'] - filteredDf['nll_adder'])
-    plt.plot(r, 1*np.ones(filteredDf.shape[0]), 'b.', label=r'sizer, nGens=20, $\tau_u=2$')
-    
+    rs = -(filteredDf['nll_sizer'] - filteredDf['nll_adder'])
+    nCorrect_sizer = (rs>0).sum()
+    nTotal_sizer = filteredDf.shape[0]
+    plt.plot(rs, 1*np.ones(filteredDf.shape[0]), 'b.', label=r'sizer, nGens=20, $\tau_u=2$')
+
     filteredDf = df[(df['sizer_gt'] == 0) & (df['noiseless'] == 0) & (df['nGens'] == 20) & (df['tau_u_gt'] == 2)]
-    r = -(filteredDf['nll_sizer'] - filteredDf['nll_adder'])
-    plt.plot(r, 2*np.ones(filteredDf.shape[0]), 'b+',  label=r'adder, nGens=20, $\tau_u=2$')
+    ra = -(filteredDf['nll_sizer'] - filteredDf['nll_adder'])
+    nCorrect_adder = (ra<0).sum()
+    nTotal_adder = filteredDf.shape[0]
+    plt.plot(ra, 2*np.ones(filteredDf.shape[0]), 'b+',  label=r'adder, nGens=20, $\tau_u=2$; ' + f'#lineages={nTotal_sizer+nTotal_adder}, %correct={str(round(100*(nCorrect_sizer+nCorrect_adder)/(nTotal_sizer+nTotal_adder)))}, performance={str(round(np.concatenate((-ra,rs)).mean()))}')
     ###########
     filteredDf = df[(df['sizer_gt'] == 1) & (df['noiseless'] == 0) & (df['nGens'] == 20) & (df['tau_u_gt'] == 40)]
-    r = -(filteredDf['nll_sizer'] - filteredDf['nll_adder'])
-    plt.plot(r, 3*np.ones(filteredDf.shape[0]), 'g.', label=r'sizer, nGens=20, $\tau_u=40$')
-    
+    rs = -(filteredDf['nll_sizer'] - filteredDf['nll_adder'])
+    nCorrect_sizer = (rs>0).sum()
+    nTotal_sizer = filteredDf.shape[0]
+    plt.plot(rs, 3*np.ones(filteredDf.shape[0]), 'g.', label=r'sizer, nGens=20, $\tau_u=40$')
+
     filteredDf = df[(df['sizer_gt'] == 0) & (df['noiseless'] == 0) & (df['nGens'] == 20) & (df['tau_u_gt'] == 40)]
-    r = -(filteredDf['nll_sizer'] - filteredDf['nll_adder'])
-    plt.plot(r, 4*np.ones(filteredDf.shape[0]), 'g+',  label=r'adder, nGens=20, $\tau_u=40$')
-    
+    ra = -(filteredDf['nll_sizer'] - filteredDf['nll_adder'])
+    nCorrect_adder = (ra<0).sum()
+    nTotal_adder = filteredDf.shape[0]
+    plt.plot(ra, 4*np.ones(filteredDf.shape[0]), 'g+',  label=r'adder, nGens=20, $\tau_u=40$; ' + f'#lineages={nTotal_sizer+nTotal_adder}, %correct={str(round(100*(nCorrect_sizer+nCorrect_adder)/(nTotal_sizer+nTotal_adder)))}, performance={str(round(np.concatenate((-ra,rs)).mean()))}')
+
     ###########
     filteredDf = df[(df['sizer_gt'] == 1) & (df['noiseless'] == 0) & (df['nGens'] == 20) & (df['tau_u_gt'] == 200)]
-    r = -(filteredDf['nll_sizer'] - filteredDf['nll_adder'])
-    plt.plot(r, 5*np.ones(filteredDf.shape[0]), 'r.', label=r'sizer, nGens=20, $\tau_u=200$')
-    
+    rs = -(filteredDf['nll_sizer'] - filteredDf['nll_adder'])
+    nCorrect_sizer = (rs>0).sum()
+    nTotal_sizer = filteredDf.shape[0]
+    plt.plot(rs, 5*np.ones(filteredDf.shape[0]), 'r.', label=r'sizer, nGens=20, $\tau_u=200$')
+
     filteredDf = df[(df['sizer_gt'] == 0) & (df['noiseless'] == 0) & (df['nGens'] == 20) & (df['tau_u_gt'] == 200)]
-    r = -(filteredDf['nll_sizer'] - filteredDf['nll_adder'])
-    plt.plot(r, 6*np.ones(filteredDf.shape[0]), 'r+',  label=r'adder, nGens=20, $\tau_u=200$')
-    
+    ra = -(filteredDf['nll_sizer'] - filteredDf['nll_adder'])
+    nCorrect_adder = (ra<0).sum()
+    nTotal_adder = filteredDf.shape[0]
+    plt.plot(ra, 6*np.ones(filteredDf.shape[0]), 'r+',  label=r'adder, nGens=20, $\tau_u=200$; ' + f'#lineages={nTotal_sizer+nTotal_adder}, %correct={str(round(100*(nCorrect_sizer+nCorrect_adder)/(nTotal_sizer+nTotal_adder)))}, performance={str(round(np.concatenate((-ra,rs)).mean()))}')
+
+
     
     plt.grid()
     plt.xlabel('log(r)')
@@ -234,7 +259,7 @@ if not newResults:
 #############################################################################################################################
 if newResults:
     nGenerations = 100   
-    nLineagesToPlot = 30
+    nLineagesToPlot = 60
     noiseLess = False
     
     if noiseLess:
@@ -270,7 +295,8 @@ if newResults:
                     
                     likelihoodDict = {'sizer_likelihoods': sizer_likelihoods, 'sizerEstStr': sizerEstStr, 'adder_likelihoods': adder_likelihoods, 'adderEstStr': adderEstStr, 'sizer_nlogLikelihood': sizer_nlogLikelihood, 'adder_nlogLikelihood': adder_nlogLikelihood}
                     
-                    plot_cs_and_lineage(ts, u[:,lineageIdx:lineageIdx+1], observations[lineageIdx:lineageIdx+1,:nLineagesToPlot], xlabel='min', ylabel='$\mathrm{[\mu m]}$', title=mechanismType + noiseStr + r' $\tau_u = $' + str(tau_u) + r', $\mu_u = $' + f'{str(round(filteredDf["mu_u_gt"].to_numpy()[0],2))}'+ r', $\sigma_u = $' + f'{str(round(filteredDf["sigma_u_gt"].to_numpy()[0],2))}' + f' lineage {lineageIdx}', mechanismType=mechanismType, likelihoodDict=likelihoodDict)
+                    #plot_cs_and_lineage(ts, u[:,lineageIdx:lineageIdx+1], observations[lineageIdx:lineageIdx+1,:nLineagesToPlot], xlabel='min', ylabel='$\mathrm{[\mu m]}$', title=mechanismType + noiseStr + r' $\tau_u = $' + str(tau_u) + r', $\mu_u = $' + f'{str(round(filteredDf["mu_u_gt"].to_numpy()[0],2))}'+ r', $\sigma_u = $' + f'{str(round(filteredDf["sigma_u_gt"].to_numpy()[0],2))}' , mechanismType=mechanismType, likelihoodDict=likelihoodDict)
+                    plot_cs_and_lineage(ts, u[:,lineageIdx:lineageIdx+1], observations[lineageIdx:lineageIdx+1,:nLineagesToPlot], xlabel='min', ylabel='$\mathrm{[\mu m]}$', title=mechanismType + noiseStr + r' $\tau_u = $' + str(tau_u) + r', $\mu_u = $' + f'{str(round(filteredDf["mu_u_gt"].to_numpy()[0],2))}'+ r', $\sigma_u = $' + f'{str(round(filteredDf["sigma_u_gt"].to_numpy()[0],2))}' , mechanismType=mechanismType)#, likelihoodDict=likelihoodDict)
                 
             # observations: [f, xb, xd, T])
             

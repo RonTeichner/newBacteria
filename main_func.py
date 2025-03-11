@@ -175,9 +175,10 @@ class SDE_1D(nn.Module):
 def plot_cs_and_lineage(ts, samples, observations, xlabel, ylabel, title='', mechanismType='sizer', FPTs=None, paramStr='', xlim=None, ylim=None, filename=None, hist=None, bin_edges=None, plotOnlyInputHist=False, likelihoodDict=None):
     samples = np.transpose(samples[:,:,0])
     colors = ['brown', 'magenta', 'purple']
+    axx,ab = 16/3, 9/3
     assert FPTs is None or likelihoodDict is None
     if not(likelihoodDict is None):
-        fig, axs = plt.subplots(2, 1, sharex=True, figsize=(30,4))
+        fig, axs = plt.subplots(2, 1, sharex=True, figsize=(axx*1,ab*2))
     else:
         plt.figure()#figsize=(20/1.5,5/1.5))
     if not(FPTs is None):
@@ -192,8 +193,8 @@ def plot_cs_and_lineage(ts, samples, observations, xlabel, ylabel, title='', mec
         tIndices = t_xb < ts[-1]
         t_xb, t_xd, xb, xd = t_xb[tIndices], t_xd[tIndices], xb[tIndices], xd[tIndices]
         if not(likelihoodDict is None):
-            axs[0].plot(t_xb, xb, 'og', markersize=10, linewidth=6)
-            axs[0].plot(t_xd, xd, 'or', markersize=10, linewidth=6)
+            axs[0].plot(t_xb, xb, 'og', markersize=10, linewidth=6, label=r'$x_b$')
+            axs[0].plot(t_xd, xd, 'or', markersize=10, linewidth=6, label=r'$x_d$')
         else:
             plt.plot(t_xb, xb, 'og', markersize=10, linewidth=6)
             plt.plot(t_xd, xd, 'or', markersize=10, linewidth=6)
@@ -203,55 +204,68 @@ def plot_cs_and_lineage(ts, samples, observations, xlabel, ylabel, title='', mec
             tVec = np.linspace(t_xb[t_xb_idx], t_xd[t_xb_idx], 10)
             xVals = xb[t_xb_idx]*np.exp(alpha*(tVec-tVec[0]))
             if not(likelihoodDict is None):
-                axs[0].plot(tVec, xVals, '--k')
-                
-                axs[0].plot(tVec, xVals-xb[t_xb_idx], '--g')
+                if t_xb_idx == 0:
+                    axs[0].plot(tVec, xVals, '--k', label=r'$x(t)$')
+                    axs[0].plot(tVec, xVals-xb[t_xb_idx], '--g', label=r'$\Delta(t)$')
+                else:
+                    axs[0].plot(tVec, xVals, '--k')
+                    axs[0].plot(tVec, xVals-xb[t_xb_idx], '--g')
             else:
                 plt.plot(tVec, xVals, '--k')
-                if mechanismType == 'adder':
-                    plt.plot(tVec, xVals-xb[t_xb_idx], '--g')
+                
+                plt.plot(tVec, xVals-xb[t_xb_idx], '--g', label=r'$\Delta(t)$')
         if samples.shape[0] > 1:
             if not(likelihoodDict is None):
-                axs[0].plot(ts, sample[:len(ts)], color=colors[i], linewidth = 0.5, label=f'u {i}')
+                axs[0].plot(ts, sample[:len(ts)], color=colors[i], linewidth = 0.5, label=r'$u(t)$')
+                
             else:
                 plt.plot(ts, sample[:len(ts)], color=colors[i], linewidth = 0.5, label=f'u {i}')
         else:
             if not(likelihoodDict is None):
-                axs[0].plot(ts, sample[:len(ts)], color=colors[i], linewidth = 0.5, label=f'u')
+                axs[0].plot(ts, sample[:len(ts)], color=colors[i], linewidth = 0.5, label=r'$u(t)$')
+                
             else:
                 plt.plot(ts, sample[:len(ts)], color=colors[i], linewidth = 0.5, label=f'u')
     if not(likelihoodDict is None):
         axs[0].set_title(title, fontsize=16)
-        axs[0].set_xlabel(xlabel, fontsize=16)
-        axs[0].set_ylabel(ylabel, fontsize=16)
+        axs[0].set_xlabel(xlabel, fontsize=12)
+        axs[0].set_ylabel(ylabel, fontsize=12)
+        axs[0].set_xlim([0, 500])
+        axs[0].set_ylim([0, 1.4])
+        #axs[0].legend(loc='lower left', fontsize=16, bbox_to_anchor=(1.05, 1))
         if len(t_xb) > 1:
             axs[0].set_xlim([t_xb[0], t_xb[-1]])
     else:
-        plt.title(title)
+        plt.title(title, fontsize=16)
+        #plt.xlim([0, 500])
+        plt.ylim([0, 1.4])
         plt.xlabel(xlabel)
         plt.ylabel(ylabel)
         if len(t_xb) > 1:
             plt.xlim([t_xb[0], t_xb[-1]])
+            plt.xlim([0, 500])
     #plt.legend()
     if not(likelihoodDict is None):
         enableLikelihood = False
         if not enableLikelihood:
             axs[1].plot(t_xb[1:], np.asarray(likelihoodDict['sizer_likelihoods'])[1:len(t_xb)], label=likelihoodDict['sizerEstStr'])
             axs[1].plot(t_xb[1:], np.asarray(likelihoodDict['adder_likelihoods'])[1:len(t_xb)], label=likelihoodDict['adderEstStr'])
-            axs[1].plot(t_xb[1:], np.asarray(likelihoodDict['sizer_likelihoods'])[1:len(t_xb)]-np.asarray(likelihoodDict['adder_likelihoods'])[1:len(t_xb)], label='ll(sizer) - ll(adder);' + f'mean = {str(round((np.asarray(likelihoodDict["sizer_likelihoods"])-np.asarray(likelihoodDict["adder_likelihoods"])).mean(),3))}, median = {str(round((np.median(np.asarray(likelihoodDict["sizer_likelihoods"])-np.asarray(likelihoodDict["adder_likelihoods"]))),3))}')
-            axs[1].axhline(y=0, color='k', linestyle='--')
+            #axs[1].plot(t_xb[1:], np.asarray(likelihoodDict['sizer_likelihoods'])[1:len(t_xb)]-np.asarray(likelihoodDict['adder_likelihoods'])[1:len(t_xb)], label='ll(sizer) - ll(adder);' + f'mean = {str(round((np.asarray(likelihoodDict["sizer_likelihoods"])-np.asarray(likelihoodDict["adder_likelihoods"])).mean(),3))}, median = {str(round((np.median(np.asarray(likelihoodDict["sizer_likelihoods"])-np.asarray(likelihoodDict["adder_likelihoods"]))),3))}')
+            #axs[1].axhline(y=0, color='k', linestyle='--')
             #axs[1].legend()
-            
-            axs[1].set_ylabel('loglikelihood')
+            axs[1].set_xlabel(xlabel, fontsize=12)
+            axs[1].set_ylabel('loglikelihood', fontsize=12)
+            axs[1].set_xlim([0, 500])
         else:
-            axs[1].plot(t_xb, np.exp(np.asarray(likelihoodDict['sizer_likelihoods'])[:len(t_xb)]), label=likelihoodDict['sizerEstStr'])
-            axs[1].plot(t_xb, np.exp(np.asarray(likelihoodDict['adder_likelihoods'])[:len(t_xb)]), label=likelihoodDict['adderEstStr'])
+            #axs[1].plot(t_xb, np.exp(np.asarray(likelihoodDict['sizer_likelihoods'])[:len(t_xb)]), label=likelihoodDict['sizerEstStr'])
+            #axs[1].plot(t_xb, np.exp(np.asarray(likelihoodDict['adder_likelihoods'])[:len(t_xb)]), label=likelihoodDict['adderEstStr'])
             axs[1].plot(t_xb, np.exp(np.asarray(likelihoodDict['sizer_likelihoods'])[:len(t_xb)]-np.asarray(likelihoodDict['adder_likelihoods'])[:len(t_xb)]), label='l(sizer) / l(adder);' + f'mean = {str(round((np.exp(np.asarray(likelihoodDict["sizer_likelihoods"])-np.asarray(likelihoodDict["adder_likelihoods"]))).mean(),3))}')
-            axs[1].axhline(y=0, color='k', linestyle='--')
+            #axs[1].axhline(y=0, color='k', linestyle='--')
             #axs[1].legend()
-            
-            axs[1].set_ylabel('likelihood')
-        axs[1].legend(fontsize=16, bbox_to_anchor=(1.05, 1), loc='upper left')
+            axs[1].set_xlabel(xlabel, fontsize=16)
+            #axs[1].set_ylabel('likelihood', fontsize=16)
+        #axs[1].legend(fontsize=16, loc='lower left')#, bbox_to_anchor=(1.05, 1))
+        #axs[1].legend({'sizer','adder'}, loc='lower left', fontsize=16, bbox_to_anchor=(1.05, 1))
         
     if not(FPTs is None):
         plt.subplot(1,2,2)
